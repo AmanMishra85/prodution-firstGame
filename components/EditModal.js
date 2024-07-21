@@ -1,9 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Alert, Modal, StyleSheet, Text, Pressable, View } from "react-native";
-import { TextInput } from "react-native-paper";
+import React, { useEffect, useState } from "react";
+import { Alert, Modal, StyleSheet, Text, Pressable, View, TextInput } from "react-native"; // Importing TextInput from react-native
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
-import { PostContext } from "../context/postContext";
 
 const EditModal = ({ modalVisible, setModalVisible, SinglePost }) => {
   const [loading, setLoading] = useState(false);
@@ -11,7 +9,6 @@ const EditModal = ({ modalVisible, setModalVisible, SinglePost }) => {
   const [description, setDescription] = useState("");
   const navigation = useNavigation();
 
-  // handle update post
   const updatePostHandler = async (id) => {
     try {
       setLoading(true);
@@ -25,7 +22,7 @@ const EditModal = ({ modalVisible, setModalVisible, SinglePost }) => {
     } catch (error) {
       setLoading(false);
       console.log(error);
-      alert(error.response.data.message);
+      alert(error.response?.data?.message || "Failed to update post.");
     }
   };
 
@@ -47,29 +44,31 @@ const EditModal = ({ modalVisible, setModalVisible, SinglePost }) => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            {/* <Text>{JSON.stringify(SinglePost, null, 4)}</Text> */}
             <Text style={styles.modalText}>Update Your Posts</Text>
             <Text>Title</Text>
             <TextInput
               style={styles.inputBox}
               onChangeText={(text) => setTitle(text)}
               value={title}
+              placeholder="Enter title" // Placeholder text
             />
-            <Text>Descriptioon</Text>
+            <Text>Description</Text>
             <TextInput
-              style={styles.inputBox}
+              style={[styles.inputBox, styles.textArea]}
               multiline={true}
               numberOfLines={4}
               value={description}
               onChangeText={(text) => setDescription(text)}
+              placeholder="Enter description" // Placeholder text
             />
             <View style={styles.btnContainer}>
               <Pressable
                 style={styles.button}
                 onPress={() => {
-                  updatePostHandler(SinglePost && SinglePost._id),
-                    setModalVisible(!modalVisible);
+                  updatePostHandler(SinglePost?._id);
+                  setModalVisible(!modalVisible);
                 }}
+                disabled={loading}
               >
                 <Text style={styles.textStyle}>
                   {loading ? "Please Wait" : "UPDATE"}
@@ -78,8 +77,9 @@ const EditModal = ({ modalVisible, setModalVisible, SinglePost }) => {
               <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setModalVisible(!modalVisible)}
+                disabled={loading}
               >
-                <Text style={styles.textStyle}>cancel</Text>
+                <Text style={styles.textStyle}>Cancel</Text>
               </Pressable>
             </View>
           </View>
@@ -113,25 +113,25 @@ const styles = StyleSheet.create({
   inputBox: {
     marginBottom: 20,
     paddingTop: 10,
-    textAlignVertical: "top",
     backgroundColor: "lightgray",
     borderRadius: 10,
     marginTop: 10,
     paddingLeft: 10,
   },
+  textArea: {
+    minHeight: 100, // Adjust height for multiline text inputs
+  },
   btnContainer: {
     flexDirection: "row",
+    justifyContent: "flex-end", // Align buttons to the right
   },
   button: {
     borderRadius: 10,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     backgroundColor: "black",
     elevation: 2,
-    width: 100,
     margin: 10,
-  },
-  buttonOpen: {
-    // backgroundColor: "#F194FF",
   },
   buttonClose: {
     backgroundColor: "red",
@@ -144,6 +144,8 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center",
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });
 
